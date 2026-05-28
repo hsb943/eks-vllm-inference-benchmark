@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: loadgen
+  namespace: llm-demo
+spec:
+  restartPolicy: Never
+  nodeSelector:
+    workload-type: cpu
+  containers:
+    - name: loadgen
+      image: python:3.11-slim
+      imagePullPolicy: IfNotPresent
+      command:
+        - /bin/sh
+        - -c
+      args:
+        - pip install --no-cache-dir aiohttp && python /app/load_test.py
+      env:
+        - name: VLLM_URL
+          value: http://vllm-service.llm-demo.svc.cluster.local/v1/chat/completions
+        - name: MODEL_NAME
+          value: llama31-8b
+      volumeMounts:
+        - name: script
+          mountPath: /app
+  volumes:
+    - name: script
+      configMap:
+        name: loadgen-script
