@@ -1,17 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: vllm-llama31-8b
+  name: vllm-qwen25-7b
   namespace: llm-demo
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
-      app: vllm-llama31-8b
+      app: vllm-qwen25-7b
   template:
     metadata:
       labels:
-        app: vllm-llama31-8b
+        app: vllm-qwen25-7b
     spec:
       nodeSelector:
         workload-type: gpu
@@ -25,9 +27,9 @@ spec:
           imagePullPolicy: IfNotPresent
           args:
             - --model
-            - meta-llama/Llama-3.1-8B-Instruct
+            - Qwen/Qwen2.5-7B-Instruct
             - --served-model-name
-            - llama31-8b
+            - qwen25-7b
             - --host
             - 0.0.0.0
             - --port
@@ -35,9 +37,11 @@ spec:
             - --gpu-memory-utilization
             - "0.90"
             - --max-num-seqs
-            - "32"
+            - "64"
             - --max-num-batched-tokens
             - "4096"
+            - --max-model-len
+            - "8192"
             - --enable-prefix-caching
           env:
             - name: HUGGING_FACE_HUB_TOKEN
@@ -48,6 +52,9 @@ spec:
           ports:
             - name: http
               containerPort: 8000
+          volumeMounts:
+            - name: hf-cache
+              mountPath: /root/.cache/huggingface
           resources:
             requests:
               cpu: "4"
@@ -65,11 +72,22 @@ spec:
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 12
+          startupProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 60
           livenessProbe:
             httpGet:
               path: /health
               port: http
-            initialDelaySeconds: 120
             periodSeconds: 20
             timeoutSeconds: 5
             failureThreshold: 6
+      volumes:
+        - name: hf-cache
+          hostPath:
+            path: /var/cache/huggingface
+            type: DirectoryOrCreate

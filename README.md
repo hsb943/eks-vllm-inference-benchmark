@@ -1,6 +1,6 @@
-# EKS vLLM Inference Demo
+# EKS vLLM Inference Benchmark
 
-This project deploys `Llama 3.1 8B Instruct` behind a vLLM OpenAI-compatible API on Amazon EKS and runs a small concurrency demo from a CPU node.
+This project deploys `Qwen2.5-7B-Instruct` behind a vLLM OpenAI-compatible API on Amazon EKS and runs a small concurrency demo from a CPU node.
 
 ## Architecture
 
@@ -84,7 +84,7 @@ Use those two runs to explain:
 Check the serving pod placement:
 
 ```powershell
-kubectl get pod -n llm-demo -l app=vllm-llama31-8b -o wide
+kubectl get pod -n llm-demo -l app=vllm-qwen25-7b -o wide
 ```
 
 Check the API locally with port-forward:

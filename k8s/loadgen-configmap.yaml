@@ -16,7 +16,8 @@ data:
         "VLLM_URL",
         "http://vllm-service.llm-demo.svc.cluster.local/v1/chat/completions",
     )
-    MODEL = os.environ.get("MODEL_NAME", "llama31-8b")
+    MODEL = os.environ.get("MODEL_NAME", "qwen25-7b")
+    CONCURRENCY = int(os.environ.get("CONCURRENCY", "1"))
 
     PAYLOAD = {
         "model": MODEL,
@@ -73,9 +74,7 @@ data:
 
 
     async def main():
-        await run_batch(1)
-        await asyncio.sleep(3)
-        await run_batch(20)
+        await run_batch(CONCURRENCY)
 
 
     if __name__ == "__main__":

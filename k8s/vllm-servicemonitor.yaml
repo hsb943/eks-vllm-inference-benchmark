@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: vllm-qwen25-7b
+  namespace: llm-demo
+  labels:
+    release: monitoring
+spec:
+  selector:
+    matchLabels:
+      app: vllm-qwen25-7b
+      release: monitoring
+  namespaceSelector:
+    matchNames:
+      - llm-demo
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 30s
+      scrapeTimeout: 10s

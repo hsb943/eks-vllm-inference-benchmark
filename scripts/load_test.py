@@ -10,7 +10,8 @@ URL = os.environ.get(
     "VLLM_URL",
     "http://vllm-service.llm-demo.svc.cluster.local/v1/chat/completions",
 )
-MODEL = os.environ.get("MODEL_NAME", "llama31-8b")
+MODEL = os.environ.get("MODEL_NAME", "qwen25-7b")
+CONCURRENCY = int(os.environ.get("CONCURRENCY", "1"))
 
 # Shared request payload used for both the single-user and concurrent tests.
 PAYLOAD = {
@@ -85,14 +86,10 @@ async def run_batch(concurrency):
 
 # First capture the single-request baseline, then run the parallel-load experiment.
 async def main():
-    await run_batch(1)
-    await asyncio.sleep(3)
-    await run_batch(20)
+    await run_batch(CONCURRENCY)
 
 
 if __name__ == "__main__":
     asyncio.run(main())
-
-
 
 

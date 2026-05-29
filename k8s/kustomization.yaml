@@ -5,5 +5,6 @@ resources:
   - namespace.yaml
   - vllm-deployment.yaml
   - vllm-service.yaml
+  - vllm-servicemonitor.yaml
   - loadgen-configmap.yaml
   - loadgen-pod.yaml

@@ -20,7 +20,9 @@ spec:
         - name: VLLM_URL
           value: http://vllm-service.llm-demo.svc.cluster.local/v1/chat/completions
         - name: MODEL_NAME
-          value: llama31-8b
+          value: qwen25-7b
+        - name: CONCURRENCY
+          value: "50"
       volumeMounts:
         - name: script
           mountPath: /app
