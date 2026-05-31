@@ -15,11 +15,27 @@ This project deploys `Qwen/Qwen2.5-7B-Instruct` behind a vLLM OpenAI-compatible 
 7. Achieved sustained high GPU utilization under benchmark workloads.
 8. Automated infrastructure provisioning with Terraform and deployed workloads on Amazon EKS.
 
-## 2. Why This Project?
+## 2. Project Outcomes
+
+1. Served Qwen2.5-7B-Instruct using vLLM on AWS EKS.
+2. Benchmarked six controlled inference experiments (A-F).
+3. Achieved 100% GPU utilization under sustained load.
+4. Processed 150 successful requests at concurrency 50.
+5. Built a full observability stack using Prometheus, Grafana, and NVIDIA DCGM Exporter.
+6. Automated infrastructure provisioning and cluster lifecycle management using Terraform.
+
+## 3. Quick Links
+
+1. **Benchmark Report:** [`benchmarks/benchmark-report.md`](benchmarks/benchmark-report.md)
+2. **Grafana Dashboard JSON:** [`grafana/vllm-benchmark-dashboard.json`](grafana/vllm-benchmark-dashboard.json)
+3. **Kubernetes Manifests:** [`k8s/`](k8s/)
+4. **Terraform Infrastructure:** [`llm-infra-eks-terraform/`](llm-infra-eks-terraform/)
+
+## 4. Why This Project?
 
 This project studies how vLLM inference performance changes with concurrency and key runtime settings: `max-num-seqs`, `max-num-batched-tokens`, and `max-model-len`. The goal is to understand continuous batching, GPU utilization, KV cache pressure, and saturation behavior on a single NVIDIA A10G GPU.
 
-## 3. Architecture
+## 5. Architecture
 
 1. **EKS cluster** runs the inference and benchmark workloads.
 2. **GPU node group** hosts the vLLM serving pod on an NVIDIA A10G GPU.
@@ -41,7 +57,7 @@ flowchart LR
 
 ![Representative Grafana dashboard](images/experiment-f-grafana-dashboard.png)
 
-## 4. Infrastructure Used
+## 6. Infrastructure Used
 
 The cluster used separate CPU and GPU node groups so load generation and model serving could be scheduled independently.
 
@@ -52,7 +68,7 @@ The cluster used separate CPU and GPU node groups so load generation and model s
 5. Prometheus + Grafana + DCGM Exporter
 6. vLLM serving `Qwen/Qwen2.5-7B-Instruct`
 
-## 5. Tech Stack
+## 7. Tech Stack
 
 1. AWS EKS
 2. Kubernetes
@@ -65,7 +81,7 @@ The cluster used separate CPU and GPU node groups so load generation and model s
 9. DCGM Exporter
 10. Python async load generator with `aiohttp`
 
-## 6. Deployment Flow
+## 8. Deployment Flow
 
 1. Provision the EKS infrastructure and GPU node group.
 2. Create the Hugging Face token secret in the `llm-demo` namespace.
@@ -75,7 +91,7 @@ The cluster used separate CPU and GPU node groups so load generation and model s
 6. Run load generator experiments from the CPU node group.
 7. Capture benchmark results from terminal output and Grafana.
 
-## 7. Monitoring Stack
+## 9. Monitoring Stack
 
 The monitoring stack uses Prometheus and Grafana with DCGM Exporter for GPU metrics. The benchmark dashboard tracks:
 
@@ -88,7 +104,7 @@ The monitoring stack uses Prometheus and Grafana with DCGM Exporter for GPU metr
 7. vLLM pod CPU usage
 8. vLLM pod memory usage
 
-## 8. Benchmark Summary
+## 10. Benchmark Summary
 
 All experiments used a prompt length target of `1024` and `max_tokens=512`.
 
@@ -101,7 +117,7 @@ All experiments used a prompt length target of `1024` and `max_tokens=512`.
 | E | 20 | 64 | 4096 | 2048 | 17.98s | 17.99s | 1.11 | Not reliably captured | 20029 MiB | Larger token batches did not improve this saturated workload. |
 | F | 50 | 64 | 4096 | 8192 | 21.56s | 21.96s | 2.32 | 100% | 20059 MiB | Sustained load shows saturation and latency growth. |
 
-## 9. Key Findings
+## 11. Key Findings
 
 1. Increasing concurrency improved throughput through vLLM continuous batching.
 2. GPU utilization became clearly visible once concurrency reached Experiment C.
@@ -110,7 +126,7 @@ All experiments used a prompt length target of `1024` and `max_tokens=512`.
 5. Experiment F showed higher throughput with higher latency under sustained concurrency 50.
 6. GPU memory, running requests, waiting requests, and tail latency are the most useful signals for understanding vLLM serving behavior.
 
-## 10. Lessons Learned
+## 12. Lessons Learned
 
 1. Continuous batching is the main source of throughput gains.
 2. GPU memory remains high even at low concurrency because model weights stay resident.
@@ -119,11 +135,11 @@ All experiments used a prompt length target of `1024` and `max_tokens=512`.
 5. Long context length increases KV cache pressure.
 6. Throughput and latency must be analyzed together.
 
-## 11. Cost Note
+## 13. Cost Note
 
 The benchmark run cost approximately `$16.26`. The cluster was destroyed after experiments to avoid unnecessary AWS charges.
 
-## 12. Full Benchmark Report
+## 14. Full Benchmark Report
 
 Detailed configuration, screenshots, terminal evidence, and interpretation for each experiment are available in [benchmarks/benchmark-report.md](benchmarks/benchmark-report.md).
 Detailed AWS and Kubernetes deployment verification screenshots are also included in the benchmark report.
