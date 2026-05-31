@@ -10,7 +10,7 @@ This project deploys `Qwen/Qwen2.5-7B-Instruct` behind a vLLM OpenAI-compatible 
 2. Built <ins><strong>end-to-end observability</strong></ins> using <ins><strong>Prometheus</strong></ins>, <ins><strong>Grafana</strong></ins>, and <ins><strong>NVIDIA DCGM Exporter</strong></ins>.
 3. Implemented <ins><strong>Kubernetes-native load generation</strong></ins> and <ins><strong>benchmarking workflows</strong></ins>.
 4. Executed <ins><strong>six controlled benchmarking experiments (A-F)</strong></ins> to evaluate <ins><strong>inference performance</strong></ins>.
-5. Analyzed the effects of <ins><strong>concurrency</strong></ins>, <ins><strong><code>max-num-seqs</code></strong></ins>, <ins><strong><code>max-num-batched-tokens</code></strong></ins>, and <ins><strong><code>max-model-len</code></strong></ins> on <ins><strong>throughput</strong></ins> and <ins><strong>latency</strong></ins>.
+5. Analyzed the effects of <ins><strong>concurrency</strong></ins>, `max-num-seqs`, `max-num-batched-tokens`, and `max-model-len` on <ins><strong>throughput</strong></ins> and <ins><strong>latency</strong></ins>.
 6. Measured <ins><strong>GPU utilization</strong></ins>, <ins><strong>GPU memory consumption</strong></ins>, <ins><strong>request throughput</strong></ins>, <ins><strong>latency</strong></ins>, and <ins><strong>queueing behavior</strong></ins>.
 7. Achieved <ins><strong>sustained high GPU utilization</strong></ins> under benchmark workloads.
 8. Automated <ins><strong>infrastructure provisioning</strong></ins> with <ins><strong>Terraform</strong></ins> and deployed workloads on <ins><strong>Amazon EKS</strong></ins>.
