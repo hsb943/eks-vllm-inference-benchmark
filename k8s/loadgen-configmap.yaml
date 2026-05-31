@@ -18,6 +18,29 @@ data:
     )
     MODEL = os.environ.get("MODEL_NAME", "qwen25-7b")
     CONCURRENCY = int(os.environ.get("CONCURRENCY", "1"))
+    PROMPT_LENGTH = int(os.environ.get("PROMPT_LENGTH", "1024"))
+    MAX_TOKENS = int(os.environ.get("MAX_TOKENS", "512"))
+    DURATION_SECONDS = int(os.environ.get("DURATION_SECONDS", "0"))
+
+    PROMPT_WORDS = [
+        "continuous",
+        "batching",
+        "queueing",
+        "gpu",
+        "utilization",
+        "kv",
+        "cache",
+        "latency",
+        "throughput",
+        "serving",
+        "benchmark",
+        "tokens",
+        "requests",
+        "scheduler",
+        "memory",
+        "prefill",
+    ]
+    PROMPT = " ".join(PROMPT_WORDS[index % len(PROMPT_WORDS)] for index in range(PROMPT_LENGTH))
 
     PAYLOAD = {
         "model": MODEL,
@@ -25,11 +48,11 @@ data:
             {"role": "system", "content": "You are a concise assistant."},
             {
                 "role": "user",
-                "content": "Explain in 80 words what continuous batching means in LLM serving.",
+                "content": PROMPT,
             },
         ],
         "temperature": 0.0,
-        "max_tokens": 120,
+        "max_tokens": MAX_TOKENS,
     }
 
 
@@ -52,18 +75,26 @@ data:
         return ordered[index]
 
 
-    async def run_batch(concurrency):
-        async with aiohttp.ClientSession() as session:
-            tasks = [one_request(session, idx) for idx in range(concurrency)]
-            batch_start = time.perf_counter()
-            results = await asyncio.gather(*tasks)
-            total_time = time.perf_counter() - batch_start
+    async def run_once(session, idx, results):
+        results.append(await one_request(session, idx))
 
+
+    async def run_for_duration(session, worker_id, deadline, results):
+        request_id = worker_id
+        while time.perf_counter() < deadline:
+            results.append(await one_request(session, request_id))
+            request_id += CONCURRENCY
+
+
+    def print_summary(concurrency, results, total_time):
         latencies = [item["latency_s"] for item in results if item["status"] == 200]
         successes = sum(1 for item in results if item["status"] == 200)
 
         print()
         print(f"=== Concurrency: {concurrency} ===")
+        print(f"Prompt length target: {PROMPT_LENGTH}")
+        print(f"Max output tokens: {MAX_TOKENS}")
+        print(f"Duration target: {DURATION_SECONDS}s")
         print(f"Success: {successes}/{len(results)}")
         print(f"Wall time: {total_time:.2f}s")
         if latencies:
@@ -71,6 +102,25 @@ data:
             print(f"P50 latency: {statistics.median(latencies):.2f}s")
             print(f"P95 latency: {percentile(latencies, 0.95):.2f}s")
             print(f"Req/s: {successes / total_time:.2f}")
+        for item in results:
+            if item["status"] != 200:
+                print(f"Failure status: {item['status']}")
+                print(f"Failure body length: {item['body_len']}")
+
+
+    async def run_batch(concurrency):
+        async with aiohttp.ClientSession() as session:
+            results = []
+            batch_start = time.perf_counter()
+            if DURATION_SECONDS > 0:
+                deadline = batch_start + DURATION_SECONDS
+                tasks = [run_for_duration(session, idx, deadline, results) for idx in range(concurrency)]
+            else:
+                tasks = [run_once(session, idx, results) for idx in range(concurrency)]
+            await asyncio.gather(*tasks)
+            total_time = time.perf_counter() - batch_start
+
+        print_summary(concurrency, results, total_time)
 
 
     async def main():

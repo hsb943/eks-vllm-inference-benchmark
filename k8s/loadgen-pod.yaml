@@ -23,6 +23,12 @@ spec:
           value: qwen25-7b
         - name: CONCURRENCY
           value: "50"
+        - name: PROMPT_LENGTH
+          value: "1024"
+        - name: MAX_TOKENS
+          value: "512"
+        - name: DURATION_SECONDS
+          value: "60"
       volumeMounts:
         - name: script
           mountPath: /app
