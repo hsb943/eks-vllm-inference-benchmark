@@ -4,6 +4,17 @@ Benchmarking vLLM inference on Amazon EKS with GPU-backed serving, Kubernetes-na
 
 This project deploys `Qwen/Qwen2.5-7B-Instruct` behind a vLLM OpenAI-compatible API on AWS EKS, runs controlled concurrency experiments, and captures GPU, latency, throughput, and queueing behavior through Grafana dashboards and load generator output.
 
+## Highlights
+
+- Deployed Qwen2.5-7B-Instruct on AWS EKS using vLLM for GPU-accelerated inference.
+- Built end-to-end observability using Prometheus, Grafana, and NVIDIA DCGM Exporter.
+- Implemented Kubernetes-native load generation and benchmarking workflows.
+- Executed six controlled benchmarking experiments (A-F) to evaluate inference performance.
+- Analyzed the effects of concurrency, `max-num-seqs`, `max-num-batched-tokens`, and `max-model-len` on throughput and latency.
+- Measured GPU utilization, GPU memory consumption, request throughput, latency, and queueing behavior.
+- Achieved sustained high GPU utilization under benchmark workloads.
+- Automated infrastructure provisioning with Terraform and deployed workloads on Amazon EKS.
+
 ## Why This Project?
 
 This project studies how vLLM inference performance changes with concurrency and key runtime settings: `max-num-seqs`, `max-num-batched-tokens`, and `max-model-len`. The goal is to understand continuous batching, GPU utilization, KV cache pressure, and saturation behavior on a single NVIDIA A10G GPU.
