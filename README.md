@@ -6,14 +6,14 @@ This project deploys `Qwen/Qwen2.5-7B-Instruct` behind a vLLM OpenAI-compatible 
 
 ## 1. Highlights
 
-1. Deployed Qwen2.5-7B-Instruct on AWS EKS using vLLM for GPU-accelerated inference.
-2. Built end-to-end observability using Prometheus, Grafana, and NVIDIA DCGM Exporter.
-3. Implemented Kubernetes-native load generation and benchmarking workflows.
-4. Executed six controlled benchmarking experiments (A-F) to evaluate inference performance.
-5. Analyzed the effects of concurrency, `max-num-seqs`, `max-num-batched-tokens`, and `max-model-len` on throughput and latency.
-6. Measured GPU utilization, GPU memory consumption, request throughput, latency, and queueing behavior.
-7. Achieved sustained high GPU utilization under benchmark workloads.
-8. Automated infrastructure provisioning with Terraform and deployed workloads on Amazon EKS.
+1. Deployed **Qwen2.5-7B-Instruct** on **AWS EKS** using **vLLM** for **GPU-accelerated inference**.
+2. Built **end-to-end observability** using **Prometheus**, **Grafana**, and **NVIDIA DCGM Exporter**.
+3. Implemented **Kubernetes-native load generation** and **benchmarking workflows**.
+4. Executed **six controlled benchmarking experiments (A-F)** to evaluate **inference performance**.
+5. Analyzed the effects of **concurrency**, **`max-num-seqs`**, **`max-num-batched-tokens`**, and **`max-model-len`** on **throughput** and **latency**.
+6. Measured **GPU utilization**, **GPU memory consumption**, **request throughput**, **latency**, and **queueing behavior**.
+7. Achieved **sustained high GPU utilization** under benchmark workloads.
+8. Automated **infrastructure provisioning** with **Terraform** and deployed workloads on **Amazon EKS**.
 
 ## 2. Project Outcomes
 
