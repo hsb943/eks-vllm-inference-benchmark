@@ -14,15 +14,41 @@
 | Prompt length | 1024 |
 | Output length | 512 |
 
+## Deployment Verification
+
+### EKS Cluster
+
+![AWS EKS cluster](../images/other-aws-eks-cluster-list.png)
+
+This screenshot shows that the benchmark was executed on a real AWS EKS cluster. It verifies the managed Kubernetes control plane used for the vLLM serving and monitoring workloads.
+
+### Auto Scaling Groups
+
+![AWS Auto Scaling groups](../images/other-aws-auto-scaling-groups.png)
+
+This screenshot shows the separate Auto Scaling Groups used for the cluster node groups. The setup separates CPU worker capacity from the GPU node group used for inference.
+
+### Kubernetes Nodes
+
+![kubectl get nodes](../images/other-kubectl-get-nodes.png)
+
+This screenshot shows the three-node cluster topology from `kubectl get nodes`. It verifies the CPU and GPU worker nodes available to schedule the benchmark workloads.
+
+### Pod Placement
+
+![kubectl get pods all namespaces wide](../images/other-kubectl-get-pods-wide.png)
+
+This screenshot shows pod placement across nodes using `kubectl get pods -A -o wide`. It verifies that vLLM, Prometheus, Grafana, DCGM Exporter, NVIDIA Device Plugin, and related monitoring components were running in the cluster.
+
 ## Benchmark Matrix
 
 | Experiment | Concurrency | max-num-seqs | max-num-batched-tokens | max-model-len | Prompt length | Output length | Mean latency | P95 latency | Req/s | GPU utilization | GPU memory | Interpretation |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
-| A | 1 | 32 | 2048 | 2048 | 1024 | 512 | 17.67s | 17.67s | 0.06 | 0% | 20043 MiB | Single request baseline underuses the GPU. |
-| B | 10 | 32 | 2048 | 2048 | 1024 | 512 | 17.86s | 17.88s | 0.56 | 0% | 20027 MiB | Continuous batching improves throughput with similar latency. |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|---|
+| A | 1 | 32 | 2048 | 2048 | 1024 | 512 | 17.67s | 17.67s | 0.06 | Not reliably captured | 20043 MiB | Single request baseline underuses the GPU. |
+| B | 10 | 32 | 2048 | 2048 | 1024 | 512 | 17.86s | 17.88s | 0.56 | Not reliably captured | 20027 MiB | Continuous batching improves throughput with similar latency. |
 | C | 20 | 32 | 2048 | 2048 | 1024 | 512 | 17.97s | 17.99s | 1.11 | 100% | 20027 MiB | Higher concurrency keeps the GPU busy and doubles throughput over B. |
 | D | 20 | 64 | 2048 | 2048 | 1024 | 512 | 15.66s | 18.39s | 1.09 | 100% | 20027 MiB | Extra active sequence headroom did not significantly improve throughput at concurrency 20. |
-| E | 20 | 64 | 4096 | 2048 | 1024 | 512 | 17.98s | 17.99s | 1.11 | 0% | 20029 MiB | Larger token batches did not materially improve an already saturated workload. |
+| E | 20 | 64 | 4096 | 2048 | 1024 | 512 | 17.98s | 17.99s | 1.11 | Not reliably captured | 20029 MiB | Larger token batches did not materially improve an already saturated workload. |
 | F | 50 | 64 | 4096 | 8192 | 1024 | 512 | 21.56s | 21.96s | 2.32 | 100% | 20059 MiB | Sustained concurrency 50 increased throughput and exposed latency growth. |
 
 ## Experiment A
@@ -49,7 +75,7 @@
 | P50 latency | 17.67s |
 | P95 latency | 17.67s |
 | Req/s | 0.06 |
-| GPU utilization max | 0% |
+| GPU utilization max | Not reliably captured |
 | GPU memory used max | 20043 MiB |
 | Running requests max | 1 |
 | Waiting requests max | 0 |
@@ -64,7 +90,7 @@
 
 ### 5. Interpretation
 
-Experiment A establishes the single-request baseline. The request completed successfully, but throughput was low because only one request was active. GPU memory was already allocated for the loaded model, while GPU utilization remained low, confirming that a single request underuses the GPU.
+Experiment A establishes the single-request baseline. The request completed successfully, but throughput was low because only one request was active. GPU memory was already allocated for the loaded model. GPU utilization was not reliably captured because short utilization spikes can be missed by scrape timing, but the low concurrency still demonstrates that a single request underuses the GPU.
 
 ## Experiment B
 
@@ -90,10 +116,10 @@ Experiment A establishes the single-request baseline. The request completed succ
 | P50 latency | 17.87s |
 | P95 latency | 17.88s |
 | Req/s | 0.56 |
-| GPU utilization max | 0% |
+| GPU utilization max | Not reliably captured |
 | GPU memory used max | 20027 MiB |
-| Running requests max | TODO |
-| Waiting requests max | TODO |
+| Running requests max | Not captured |
+| Waiting requests max | Not captured |
 
 ### 3. Grafana Evidence
 
@@ -213,10 +239,10 @@ Experiment D increased `max-num-seqs` from 32 to 64 while keeping concurrency at
 | P50 latency | 17.99s |
 | P95 latency | 17.99s |
 | Req/s | 1.11 |
-| GPU utilization max | 0% |
+| GPU utilization max | Not reliably captured |
 | GPU memory used max | 20029 MiB |
-| Running requests max | TODO |
-| Waiting requests max | TODO |
+| Running requests max | Not captured |
+| Waiting requests max | Not captured |
 
 ### 3. Grafana Evidence
 
@@ -272,6 +298,34 @@ Experiment E increased `max-num-batched-tokens` from 2048 to 4096. Throughput re
 
 Experiment F increased concurrency to 50, raised `max-model-len` to 8192, and ran continuously for 60 seconds. Throughput increased to 2.32 req/s, while mean and tail latency also increased. Running requests reached 50 and waiting requests stayed at 0, showing that vLLM admitted the offered load without queue buildup. GPU utilization reached 100%, and KV cache usage increased, showing stronger memory pressure under sustained load.
 
+## Comparison Summary
+
+### Req/s Comparison
+
+| Experiment | Req/s |
+|---|---:|
+| A | 0.06 |
+| B | 0.56 |
+| C | 1.11 |
+| D | 1.09 |
+| E | 1.11 |
+| F | 2.32 |
+
+### Mean Latency Comparison
+
+| Experiment | Mean Latency |
+|---|---:|
+| A | 17.67s |
+| B | 17.86s |
+| C | 17.97s |
+| D | 15.66s |
+| E | 17.98s |
+| F | 21.56s |
+
+## Final Interpretation
+
+Throughput improves with concurrency until the system approaches saturation, while latency increases under heavier sustained concurrency. GPU memory stays high even at low concurrency because model weights remain resident on the GPU. As context length and concurrency increase, KV cache pressure becomes more important, so throughput, latency, GPU memory, running requests, and waiting requests need to be analyzed together.
+
 ## Key Findings
 
 - Concurrency improves batching until the GPU approaches saturation.
@@ -280,4 +334,3 @@ Experiment F increased concurrency to 50, raised `max-model-len` to 8192, and ra
 - `max-model-len` increases KV cache capacity requirements and can raise memory pressure, especially under higher concurrency.
 - Experiment F shows saturation and tail-latency growth: throughput increased, GPU utilization reached 100%, and latency rose under sustained concurrency 50.
 - GPU memory, running requests, waiting requests, and tail latency are the most important signals for understanding vLLM serving behavior in production-like traffic.
-
