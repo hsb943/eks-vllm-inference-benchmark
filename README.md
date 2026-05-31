@@ -6,14 +6,14 @@ This project deploys `Qwen/Qwen2.5-7B-Instruct` behind a vLLM OpenAI-compatible 
 
 ## 1. Highlights
 
-1. Deployed <u>**Qwen2.5-7B-Instruct**</u> on <u>**AWS EKS**</u> using <u>**vLLM**</u> for <u>**GPU-accelerated inference**</u>.
-2. Built <u>**end-to-end observability**</u> using <u>**Prometheus**</u>, <u>**Grafana**</u>, and <u>**NVIDIA DCGM Exporter**</u>.
-3. Implemented <u>**Kubernetes-native load generation**</u> and <u>**benchmarking workflows**</u>.
-4. Executed <u>**six controlled benchmarking experiments (A-F)**</u> to evaluate <u>**inference performance**</u>.
-5. Analyzed the effects of <u>**concurrency**</u>, <u>**`max-num-seqs`**</u>, <u>**`max-num-batched-tokens`**</u>, and <u>**`max-model-len`**</u> on <u>**throughput**</u> and <u>**latency**</u>.
-6. Measured <u>**GPU utilization**</u>, <u>**GPU memory consumption**</u>, <u>**request throughput**</u>, <u>**latency**</u>, and <u>**queueing behavior**</u>.
-7. Achieved <u>**sustained high GPU utilization**</u> under benchmark workloads.
-8. Automated <u>**infrastructure provisioning**</u> with <u>**Terraform**</u> and deployed workloads on <u>**Amazon EKS**</u>.
+1. Deployed <ins><strong>Qwen2.5-7B-Instruct</strong></ins> on <ins><strong>AWS EKS</strong></ins> using <ins><strong>vLLM</strong></ins> for <ins><strong>GPU-accelerated inference</strong></ins>.
+2. Built <ins><strong>end-to-end observability</strong></ins> using <ins><strong>Prometheus</strong></ins>, <ins><strong>Grafana</strong></ins>, and <ins><strong>NVIDIA DCGM Exporter</strong></ins>.
+3. Implemented <ins><strong>Kubernetes-native load generation</strong></ins> and <ins><strong>benchmarking workflows</strong></ins>.
+4. Executed <ins><strong>six controlled benchmarking experiments (A-F)</strong></ins> to evaluate <ins><strong>inference performance</strong></ins>.
+5. Analyzed the effects of <ins><strong>concurrency</strong></ins>, <ins><strong><code>max-num-seqs</code></strong></ins>, <ins><strong><code>max-num-batched-tokens</code></strong></ins>, and <ins><strong><code>max-model-len</code></strong></ins> on <ins><strong>throughput</strong></ins> and <ins><strong>latency</strong></ins>.
+6. Measured <ins><strong>GPU utilization</strong></ins>, <ins><strong>GPU memory consumption</strong></ins>, <ins><strong>request throughput</strong></ins>, <ins><strong>latency</strong></ins>, and <ins><strong>queueing behavior</strong></ins>.
+7. Achieved <ins><strong>sustained high GPU utilization</strong></ins> under benchmark workloads.
+8. Automated <ins><strong>infrastructure provisioning</strong></ins> with <ins><strong>Terraform</strong></ins> and deployed workloads on <ins><strong>Amazon EKS</strong></ins>.
 
 ## 2. Project Outcomes
 
