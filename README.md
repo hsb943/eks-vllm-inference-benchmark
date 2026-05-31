@@ -1,4 +1,4 @@
-# EKS vLLM Inference Benchmark
+# GPU-Accelerated LLM Serving and Benchmarking with vLLM on AWS EKS
 
 Benchmarking vLLM inference on Amazon EKS with GPU-backed serving, Kubernetes-native load generation, and Prometheus/Grafana observability.
 
